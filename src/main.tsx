@@ -20,7 +20,7 @@ function AppRoutes() {
   return (
     <>
       {isEnabled && !isUnlocked && <LockScreen />}
-      <BrowserRouter>
+      <BrowserRouter basename="/streak-keep">
         <Routes>
           <Route element={<AppShell />}>
             <Route index element={<TodayPage />} />

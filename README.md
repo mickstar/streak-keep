@@ -1,73 +1,24 @@
-# React + TypeScript + Vite
+# StreakKeep
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A minimal habit tracker and diary PWA — track daily habits, build streaks, and jot down notes. No account required. All data stays on your device.
 
-Currently, two official plugins are available:
+**[Open the app →](https://mickstar.github.io/streak-keep/)**
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+- **Habit tracking** — create habits and check them off each day
+- **Streak calendar** — visualise your consistency over time
+- **Daily diary** — attach notes to any day
+- **Biometric lock** — protect your data with Face ID, Touch ID, or fingerprint
+- **Works offline** — installable PWA, no internet needed after first load
+- **Dark & light mode** — follows your system preference
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Install as an app
 
-## Expanding the ESLint configuration
+On iPhone/iPad: tap the share icon → *Add to Home Screen*
+On Android: tap the browser menu → *Install app* (or *Add to Home Screen*)
+On desktop: click the install icon in the address bar
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Tech
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Vite · React 19 · TypeScript · Tailwind CSS v4 · React Router v7 · WebAuthn

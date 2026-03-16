@@ -4,6 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+  base: '/streak-keep/',
   plugins: [
     react(),
     tailwindcss(),
@@ -14,7 +15,7 @@ export default defineConfig({
         name: 'StreakKeep',
         short_name: 'StreakKeep',
         description: 'Track daily habits and build streaks',
-        start_url: '/',
+        start_url: '/streak-keep/',
         display: 'standalone',
         theme_color: '#4f46e5',
         background_color: '#1e1b4b',
