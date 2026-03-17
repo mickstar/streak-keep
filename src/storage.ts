@@ -1,24 +1,57 @@
-import type { AppData, CheckIn } from './types'
+import type { AppData } from './types'
 
 const STORAGE_KEY = 'streak-keep:data'
 
-const EMPTY: AppData = { habits: [], checkIns: [], notes: [] }
+export const CURRENT_VERSION = 1
+
+const EMPTY: AppData = { habits: [], checkIns: [], notes: [], version: CURRENT_VERSION }
+
+// ---------------------------------------------------------------------------
+// Migration runner
+// ---------------------------------------------------------------------------
+
+type RawData = Record<string, unknown>
+
+// Each migration receives the raw object at version N and returns it at N+1.
+// Migrations are append-only — never edit an existing entry.
+const migrations: Array<(data: RawData) => RawData> = [
+  // v0 → v1: backfill status on check-ins, ensure notes array exists, remove orphan notes
+  (data) => {
+    const checkIns = (data.checkIns as Array<Record<string, unknown>>) ?? []
+    const notes = (data.notes as Array<Record<string, unknown>>) ?? []
+    return {
+      ...data,
+      checkIns: checkIns.map((c) => ({ ...c, status: c.status ?? 'completed' })),
+      notes: notes.filter((n) => !!n.habitId),
+      version: 1,
+    }
+  },
+]
+
+export function runMigrations(raw: RawData, fromVersion: number): AppData {
+  let data = { ...raw }
+  for (let v = fromVersion; v < CURRENT_VERSION; v++) {
+    data = migrations[v](data)
+  }
+  // Ensure version is always set to current after all migrations
+  data.version = CURRENT_VERSION
+  return data as unknown as AppData
+}
+
+// ---------------------------------------------------------------------------
+// Public API
+// ---------------------------------------------------------------------------
 
 export function loadData(): AppData {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return EMPTY
-    const data = JSON.parse(raw) as AppData
-    // Default missing status to 'completed' for legacy check-ins
-    data.checkIns = data.checkIns.map((c) => ({
-      ...c,
-      status: (c as CheckIn & { status?: 'completed' | 'failed' }).status ?? 'completed',
-    }))
-    // Default missing notes for legacy data
-    data.notes = data.notes ?? []
-    // Filter out orphan notes that have no habitId (legacy data migration)
-    data.notes = data.notes.filter((n) => !!(n as { habitId?: string }).habitId)
-    return data
+    const stored = localStorage.getItem(STORAGE_KEY)
+    if (!stored) return EMPTY
+    const raw = JSON.parse(stored) as RawData
+    const fromVersion = typeof raw.version === 'number' ? raw.version : 0
+    if (fromVersion === CURRENT_VERSION) return raw as unknown as AppData
+    const migrated = runMigrations(raw, fromVersion)
+    saveData(migrated)
+    return migrated
   } catch {
     return EMPTY
   }

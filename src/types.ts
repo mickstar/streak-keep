@@ -26,4 +26,5 @@ export interface AppData {
   habits: Habit[]
   checkIns: CheckIn[]
   notes: Note[]
+  version?: number
 }

@@ -12,7 +12,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'vite preview --base /streak-keep/',
+    command: 'vite build && vite preview --base /streak-keep/',
     url: 'http://localhost:4173/streak-keep/',
     reuseExistingServer: false,
   },
