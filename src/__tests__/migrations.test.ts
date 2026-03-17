@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { runMigrations, loadData, saveData, CURRENT_VERSION } from '../storage'
+import { runMigrations, loadData, CURRENT_VERSION } from '../storage'
 
 // ---------------------------------------------------------------------------
 // runMigrations — pure function tests (no localStorage needed)
