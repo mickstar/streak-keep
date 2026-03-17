@@ -7,16 +7,19 @@ export default function NoteEditorPage() {
   const { state, dispatch } = useApp()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const { id: noteId } = useParams<{ id: string }>()
+  // `id` is a note ID on /diary/:id/edit, or a habit ID on /habits/:id/notes/new
+  const { id } = useParams<{ id: string }>()
 
-  const isEdit = !!noteId
-  const existingNote = isEdit ? state.notes.find((n) => n.id === noteId) : undefined
+  const existingNote = id ? state.notes.find((n) => n.id === id) : undefined
+  const isEdit = !!existingNote
 
   const date = existingNote?.date ?? searchParams.get('date') ?? toLocalDate()
-  const habitId = existingNote?.habitId ?? searchParams.get('habitId') ?? undefined
+  // Resolve habitId: from existing note > route param (habit-scoped new) > search param
+  const habitId = existingNote?.habitId ?? (!isEdit && id ? id : undefined) ?? searchParams.get('habitId') ?? undefined
+  const habit = habitId ? state.habits.find((h) => h.id === habitId) : undefined
   const [body, setBody] = useState(existingNote?.body ?? '')
 
-  const canSave = body.trim().length > 0
+  const canSave = body.trim().length > 0 && (isEdit || !!habitId)
 
   const dateLabel = new Date(date + 'T12:00:00').toLocaleDateString('en-US', {
     weekday: 'long',
@@ -27,18 +30,18 @@ export default function NoteEditorPage() {
 
   function handleSave() {
     if (!canSave) return
-    if (isEdit && noteId) {
-      dispatch({ type: 'UPDATE_NOTE', payload: { id: noteId, body: body.trim() } })
-    } else {
+    if (isEdit && existingNote) {
+      dispatch({ type: 'UPDATE_NOTE', payload: { id: existingNote.id, body: body.trim() } })
+    } else if (habitId) {
       dispatch({ type: 'ADD_NOTE', payload: { date, body: body.trim(), habitId } })
     }
     navigate(-1)
   }
 
   function handleDelete() {
-    if (!noteId) return
+    if (!existingNote) return
     if (window.confirm('Delete this note? This cannot be undone.')) {
-      dispatch({ type: 'DELETE_NOTE', payload: { id: noteId } })
+      dispatch({ type: 'DELETE_NOTE', payload: { id: existingNote.id } })
       navigate('/diary', { replace: true })
     }
   }
@@ -57,6 +60,11 @@ export default function NoteEditorPage() {
           </svg>
         </button>
         <div className="flex-1 min-w-0">
+          {habit && (
+            <p className="text-xs font-medium mb-0.5 truncate" style={{ color: 'var(--text-3)' }}>
+              {habit.icon} {habit.name}
+            </p>
+          )}
           <h1 className="text-xl font-semibold">{isEdit ? 'Edit note' : 'New note'}</h1>
           <p className="text-sm truncate" style={{ color: 'var(--text-2)' }}>{dateLabel}</p>
         </div>

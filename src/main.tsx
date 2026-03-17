@@ -28,6 +28,7 @@ function AppRoutes() {
             <Route path="habits/new" element={<NewHabitPage />} />
             <Route path="habits/:id" element={<HabitDetailPage />} />
             <Route path="habits/:id/edit" element={<EditHabitPage />} />
+            <Route path="habits/:id/notes/new" element={<NoteEditorPage />} />
             <Route path="diary" element={<DiaryPage />} />
             <Route path="diary/new" element={<NoteEditorPage />} />
             <Route path="diary/:id/edit" element={<NoteEditorPage />} />

@@ -12,7 +12,7 @@ type Action =
   | { type: 'RECORD_DAY_STATUS'; payload: { habitId: string; status: 'completed' | 'failed'; date?: string } }
   | { type: 'TOGGLE_CHECK_IN'; payload: { habitId: string; date: string } }
   | { type: 'REMOVE_CHECK_IN'; payload: { habitId: string; date: string } }
-  | { type: 'ADD_NOTE'; payload: { date: string; body: string; habitId?: string } }
+  | { type: 'ADD_NOTE'; payload: { date: string; body: string; habitId: string } }
   | { type: 'UPDATE_NOTE'; payload: { id: string; body: string } }
   | { type: 'DELETE_NOTE'; payload: { id: string } }
 
@@ -129,8 +129,8 @@ function reducer(state: AppData, action: Action): AppData {
         id: generateId(),
         date: action.payload.date,
         body: action.payload.body,
+        habitId: action.payload.habitId,
         createdAt: new Date().toISOString(),
-        ...(action.payload.habitId ? { habitId: action.payload.habitId } : {}),
       }
       return { ...state, notes: [...state.notes, note] }
     }

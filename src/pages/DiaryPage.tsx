@@ -1,13 +1,15 @@
 import { useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
-import { toLocalDate } from '../storage'
 
 export default function DiaryPage() {
   const { state, dispatch } = useApp()
   const navigate = useNavigate()
-  const today = toLocalDate()
 
-  const sorted = [...state.notes].sort((a, b) => a.date.localeCompare(b.date))
+  // Filter notes to only those with a valid habitId, sorted newest first
+  const validHabitIds = new Set(state.habits.map((h) => h.id))
+  const sorted = [...state.notes]
+    .filter((n) => validHabitIds.has(n.habitId))
+    .sort((a, b) => b.date.localeCompare(a.date))
 
   function handleDelete(id: string) {
     if (window.confirm('Delete this note? This cannot be undone.')) {
@@ -30,9 +32,9 @@ export default function DiaryPage() {
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Diary</h1>
         <p className="text-sm mt-1" style={{ color: 'var(--text-2)' }}>
-          {state.notes.length === 0
+          {sorted.length === 0
             ? 'No entries yet'
-            : `${state.notes.length} ${state.notes.length === 1 ? 'entry' : 'entries'}`}
+            : `${sorted.length} ${sorted.length === 1 ? 'entry' : 'entries'}`}
         </p>
       </div>
 
@@ -49,12 +51,19 @@ export default function DiaryPage() {
 
       {/* Notes list */}
       <div className="flex flex-col gap-4">
-        {sorted.map((note) => (
+        {sorted.map((note) => {
+          const habit = state.habits.find((h) => h.id === note.habitId)
+          return (
           <div
             key={note.id}
             className="rounded-2xl p-4"
             style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}
           >
+            {habit && (
+              <p className="text-xs font-medium mb-1.5" style={{ color: 'var(--text-3)' }}>
+                {habit.icon} {habit.name}
+              </p>
+            )}
             <div className="flex items-start justify-between gap-2 mb-2">
               <p className="text-xs font-medium" style={{ color: 'var(--text-3)' }}>
                 {formatDate(note.date)}
@@ -86,20 +95,10 @@ export default function DiaryPage() {
             </div>
             <p className="text-sm whitespace-pre-wrap" style={{ color: 'var(--text)' }}>{note.body}</p>
           </div>
-        ))}
+          )
+        })}
       </div>
 
-      {/* FAB — create new note */}
-      <button
-        onClick={() => navigate(`/diary/new?date=${today}`)}
-        className="fixed bottom-20 right-4 w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-white text-2xl font-light transition-opacity hover:opacity-90"
-        style={{ background: 'var(--accent)', marginBottom: 'var(--safe-bottom)' }}
-        aria-label="Add note"
-      >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-6 h-6">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-        </svg>
-      </button>
     </div>
   )
 }

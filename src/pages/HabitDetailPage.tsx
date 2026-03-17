@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, Link } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import { getAccentColor } from '../constants/colors'
 import {
@@ -27,6 +27,10 @@ export default function HabitDetailPage() {
 
   const accent = getAccentColor(habit.color)
   const today = toLocalDate()
+  const habitNotes = useMemo(
+    () => [...state.notes.filter((n) => n.habitId === habit.id)].sort((a, b) => b.date.localeCompare(a.date)),
+    [state.notes, habit.id],
+  )
   const todayCheckIn = state.checkIns.find((c) => c.habitId === habit.id && c.date === today)
   const todayStatus = todayCheckIn?.status ?? null
 
@@ -137,6 +141,42 @@ export default function HabitDetailPage() {
           createdAt={habit.createdAt}
           onToggle={handleCycleDay}
         />
+      </div>
+
+      {/* Notes */}
+      <div className="mt-6">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-base font-semibold">Notes</h2>
+          <Link
+            to={`/habits/${habit.id}/notes/new?date=${today}`}
+            className="text-sm font-medium px-3 py-1.5 rounded-xl transition-colors"
+            style={{ background: 'var(--surface-2)', color: 'var(--text-2)', border: '1px solid var(--border-2)' }}
+          >
+            + Add note
+          </Link>
+        </div>
+
+        {habitNotes.length === 0 ? (
+          <p className="text-sm py-4 text-center" style={{ color: 'var(--text-3)' }}>No notes yet</p>
+        ) : (
+          <div className="flex flex-col gap-3">
+            {habitNotes.map((note) => (
+              <button
+                key={note.id}
+                onClick={() => navigate(`/diary/${note.id}/edit`)}
+                className="w-full text-left rounded-2xl p-4 transition-colors"
+                style={{ background: 'var(--surface-2)', border: '1px solid var(--border)' }}
+              >
+                <p className="text-xs mb-1" style={{ color: 'var(--text-3)' }}>
+                  {new Date(note.date + 'T12:00:00').toLocaleDateString('en-US', {
+                    weekday: 'short', month: 'short', day: 'numeric', year: 'numeric',
+                  })}
+                </p>
+                <p className="text-sm line-clamp-2" style={{ color: 'var(--text)' }}>{note.body}</p>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

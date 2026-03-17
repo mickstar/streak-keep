@@ -16,6 +16,8 @@ export function loadData(): AppData {
     }))
     // Default missing notes for legacy data
     data.notes = data.notes ?? []
+    // Filter out orphan notes that have no habitId (legacy data migration)
+    data.notes = data.notes.filter((n) => !!(n as { habitId?: string }).habitId)
     return data
   } catch {
     return EMPTY

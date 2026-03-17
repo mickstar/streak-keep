@@ -19,7 +19,7 @@ export interface Note {
   date: string      // YYYY-MM-DD local date
   body: string
   createdAt: string // ISO timestamp
-  habitId?: string  // optional: links note to a specific habit
+  habitId: string   // links note to a specific habit
 }
 
 export interface AppData {
